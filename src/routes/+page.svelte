@@ -97,6 +97,12 @@
 			next.nps = 'Choose a score from 0 to 10.';
 		}
 
+		if (index === 3) {
+			if (!data.bestPart.trim()) next.bestPart = 'Tell us what worked best.';
+			if (!data.improve.trim()) next.improve = 'Tell us one thing you would change.';
+			if (!data.nextTopics.length) next.nextTopics = 'Pick at least one topic.';
+		}
+
 		errors = next;
 		return Object.keys(next).length === 0;
 	}
@@ -309,7 +315,7 @@
 					{:else}
 						<header class="step-head">
 							<h2>Tell us more</h2>
-							<p>This is the part we quote back to the team. Say as much or as little as you like.</p>
+							<p>This is the part we quote back to the team — a sentence or two is plenty.</p>
 						</header>
 
 						<TextField
@@ -318,6 +324,7 @@
 							placeholder="The live hooks demo finally made it click…"
 							multiline
 							rows={3}
+							error={errors.bestPart}
 						/>
 
 						<TextField
@@ -326,6 +333,7 @@
 							placeholder="More time on…"
 							multiline
 							rows={3}
+							error={errors.improve}
 						/>
 
 						<div class="block">
@@ -336,6 +344,9 @@
 								multiple
 								bind:selected={data.nextTopics}
 							/>
+							{#if errors.nextTopics}
+								<p class="field-error">{errors.nextTopics}</p>
+							{/if}
 						</div>
 
 						<TextField
@@ -637,6 +648,13 @@
 	.block-label {
 		font-size: 0.9rem;
 		font-weight: 600;
+	}
+
+	/* Under a left-aligned chip group the error sits with the text fields'
+	   errors, not centred like the ones under the star and NPS widgets. */
+	.block .field-error {
+		margin-top: 0;
+		text-align: left;
 	}
 
 	/* Padding, not margin, so `slide` animates the gap along with the field */

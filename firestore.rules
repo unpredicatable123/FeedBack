@@ -41,11 +41,13 @@ service cloud.firestore {
            && d.ratings.keys().hasOnly(['content', 'pacing', 'labs', 'instructor'])
            && d.ratings.values().hasOnly([0, 1, 2, 3, 4, 5])
 
-           && d.bestPart is string && d.bestPart.size() <= 2000
-           && d.improve is string && d.improve.size() <= 2000
+           // Best part, one change and at least one topic are required;
+           // the closing comments box stays optional.
+           && d.bestPart is string && d.bestPart.size() > 0 && d.bestPart.size() <= 2000
+           && d.improve is string && d.improve.size() > 0 && d.improve.size() <= 2000
            && d.comments is string && d.comments.size() <= 2000
 
-           && d.nextTopics is list && d.nextTopics.size() <= 20
+           && d.nextTopics is list && d.nextTopics.size() > 0 && d.nextTopics.size() <= 20
 
            // Force the server clock so responses can't be backdated.
            && d.createdAt == request.time;
