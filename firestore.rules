@@ -1,0 +1,53 @@
+rules_version = '2';
+
+// Feedback is write-only from the public web app: anyone can drop a response in,
+// nobody can read, edit or delete one from the client. Read the results from the
+// Firebase console, or server-side with the Admin SDK (which bypasses rules).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /feedback/{docId} {
+      allow read, update, delete: if false;
+
+      allow create: if isWellFormedFeedback(request.resource.data);
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+
+  function isWellFormedFeedback(d) {
+    return d.keys().hasOnly([
+             'name', 'email', 'role', 'overall', 'ratings', 'nps',
+             'bestPart', 'improve', 'nextTopics', 'comments',
+             'workshop', 'workshopTitle', 'userAgent', 'submittedAt', 'createdAt'
+           ])
+           && d.keys().hasAll(['name', 'email', 'overall', 'workshop', 'createdAt'])
+
+           && d.workshop is string && d.workshop.size() <= 100
+           && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+
+           // Name and email are both required; keep the pattern loose enough
+           // that unusual-but-valid addresses still get through.
+           && d.email is string && d.email.size() >= 5 && d.email.size() <= 200
+           && d.email.matches('^[^@ ]+@[^@ ]+[.][^@ ]+$')
+           && d.role is string && d.role.size() <= 60
+
+           && d.overall is int && d.overall >= 1 && d.overall <= 5
+           && d.nps is int && d.nps >= 0 && d.nps <= 10
+
+           && d.ratings.keys().hasOnly(['content', 'pacing', 'labs', 'instructor'])
+           && d.ratings.values().hasOnly([0, 1, 2, 3, 4, 5])
+
+           && d.bestPart is string && d.bestPart.size() <= 2000
+           && d.improve is string && d.improve.size() <= 2000
+           && d.comments is string && d.comments.size() <= 2000
+
+           && d.nextTopics is list && d.nextTopics.size() <= 20
+
+           // Force the server clock so responses can't be backdated.
+           && d.createdAt == request.time;
+  }
+}
