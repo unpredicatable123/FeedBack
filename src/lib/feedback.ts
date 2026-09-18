@@ -4,7 +4,13 @@ import { getDb, isFirebaseConfigured } from './firebase';
 export const WORKSHOP = {
 	slug: 'claude-code-in-action',
 	title: 'Claude Code in Action',
-	host: 'SymphoZen Labs'
+	host: 'SymphoZen Labs',
+	// Offered on the thank-you screen. The file lives in `static/`.
+	slides: {
+		href: '/claude-code-in-action-vit-workshop.pdf',
+		filename: 'Claude Code in Action - VIT Workshop.pdf',
+		size: '951 KB'
+	}
 } as const;
 
 export const COLLECTION = 'feedback';

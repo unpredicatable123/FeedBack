@@ -38,8 +38,27 @@
 		who ran the session and shapes what we build next.
 	</p>
 
+	<a
+		class="download"
+		href={WORKSHOP.slides.href}
+		download={WORKSHOP.slides.filename}
+		use:magnetic={{ strength: 0.18 }}
+	>
+		<span class="doc" aria-hidden="true">
+			<svg viewBox="0 0 24 24"><path d="M6 2.8h8l4 4v14.4H6z M14 2.8v4h4" /></svg>
+			<span class="doc-tag">PDF</span>
+		</span>
+		<span class="download-text">
+			<span class="download-title">Download the session slides</span>
+			<span class="download-meta">{WORKSHOP.title} · {WORKSHOP.slides.size}</span>
+		</span>
+		<span class="download-icon" aria-hidden="true">
+			<svg viewBox="0 0 16 16"><path d="M8 2.5v8.5M4.5 7.5 8 11l3.5-3.5M3 13.5h10" /></svg>
+		</span>
+	</a>
+
 	<div class="actions">
-		<a class="btn primary" href="https://www.symphozen.com" use:magnetic={{ strength: 0.22 }}>
+		<a class="btn ghost" href="https://www.symphozen.com" use:magnetic={{ strength: 0.22 }}>
 			Explore SymphoZen Labs
 			<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
 		</a>
@@ -57,6 +76,9 @@
 		text-align: center;
 		gap: 1rem;
 		padding: clamp(3rem, 9vw, 6rem) 1rem;
+		/* Auto margins switch off flex stretch, so without an explicit width the
+		   section sizes to its content and can outgrow a phone screen. */
+		width: 100%;
 		max-width: 620px;
 		margin: 0 auto;
 	}
@@ -106,12 +128,124 @@
 		font-weight: 600;
 	}
 
+	/* ---------- slides download ---------- */
+
+	.download {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		width: 100%;
+		max-width: 440px;
+		margin-top: 1.5rem;
+		padding: 0.9rem 1rem 0.9rem 0.9rem;
+		border-radius: var(--radius-box);
+		background: var(--color-primary);
+		color: var(--color-primary-content);
+		text-align: left;
+		text-decoration: none;
+		box-shadow: var(--shadow-md);
+		animation: rise var(--dur-slow) var(--ease-out) backwards 0.55s;
+		transition:
+			background var(--dur-fast) var(--ease-out),
+			box-shadow var(--dur-fast) var(--ease-out);
+	}
+
+	.download:hover {
+		background: var(--color-primary-deep);
+		box-shadow: var(--shadow-lg);
+	}
+
+	.download:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
+	}
+
+	.doc {
+		position: relative;
+		display: grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 46px;
+		height: 52px;
+		border-radius: var(--radius-field);
+		background: rgba(255, 255, 255, 0.16);
+	}
+
+	.doc svg {
+		width: 26px;
+		height: 26px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.6;
+		stroke-linejoin: round;
+	}
+
+	.doc-tag {
+		position: absolute;
+		bottom: 6px;
+		padding: 0 4px;
+		border-radius: 3px;
+		background: var(--color-primary-content);
+		color: var(--color-primary-deep);
+		font-size: 0.56rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+	}
+
+	.download-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	.download-title {
+		font-weight: 600;
+		font-size: 0.98rem;
+	}
+
+	.download-meta {
+		font-size: 0.8rem;
+		opacity: 0.8;
+	}
+
+	.download-icon {
+		display: grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 38px;
+		height: 38px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.18);
+		transition: background var(--dur-fast) var(--ease-out);
+	}
+
+	.download-icon svg {
+		width: 17px;
+		height: 17px;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	/* The arrow drops into the tray on hover */
+	.download:hover .download-icon {
+		background: rgba(255, 255, 255, 0.28);
+	}
+
+	.download:hover .download-icon svg {
+		animation: drop 0.9s var(--ease-out) infinite;
+	}
+
 	.actions {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		justify-content: center;
-		margin-top: 1.25rem;
+		margin-top: 0.75rem;
 	}
 
 	.btn {
@@ -144,17 +278,6 @@
 		transform: translateX(3px);
 	}
 
-	.primary {
-		background: var(--color-primary);
-		color: var(--color-primary-content);
-		box-shadow: var(--shadow-md);
-	}
-
-	.primary:hover {
-		background: var(--color-primary-deep);
-		box-shadow: var(--shadow-lg);
-	}
-
 	.ghost {
 		color: var(--color-muted);
 		border: 1px solid var(--color-line);
@@ -164,6 +287,36 @@
 	.ghost:hover {
 		color: var(--color-base-content);
 		border-color: var(--color-base-content);
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(14px);
+		}
+	}
+
+	@keyframes drop {
+		0% {
+			transform: translateY(-3px);
+			opacity: 0;
+		}
+		35% {
+			opacity: 1;
+		}
+		70%,
+		100% {
+			transform: translateY(1px);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.download {
+			animation: none;
+		}
+		.download:hover .download-icon svg {
+			animation: none;
+		}
 	}
 
 	@keyframes seal-in {
