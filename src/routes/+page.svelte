@@ -26,6 +26,8 @@
 
 	let data = $state<Feedback>(emptyFeedback());
 	let roleChoice = $state<string[]>([]);
+	let roleOther = $state('');
+	const isOtherRole = $derived(roleChoice[0] === 'Other');
 
 	let step = $state(0);
 	let furthest = $state(0);
@@ -59,8 +61,9 @@
 	}
 
 	// Keep the chip group (array-based) in sync with the single `role` field.
+	// "Other" is stored with its prefix so custom roles still group together.
 	$effect(() => {
-		data.role = roleChoice[0] ?? '';
+		data.role = isOtherRole ? `Other: ${roleOther.trim()}` : (roleChoice[0] ?? '');
 	});
 
 	const headline = 'How was Claude Code in Action?'.split(' ');
@@ -82,6 +85,8 @@
 			} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email.trim())) {
 				next.email = 'That email address does not look right.';
 			}
+
+			if (isOtherRole && !roleOther.trim()) next.roleOther = 'Please tell us your role.';
 		}
 
 		if (index === 1 && data.overall === 0) {
@@ -140,6 +145,7 @@
 	function reset() {
 		data = emptyFeedback();
 		roleChoice = [];
+		roleOther = '';
 		step = 0;
 		furthest = 0;
 		errors = {};
@@ -242,6 +248,22 @@
 						<div class="block">
 							<span class="block-label">What best describes your role?</span>
 							<ChipGroup options={ROLES} label="Your role" bind:selected={roleChoice} />
+
+							{#if isOtherRole}
+								<div
+									class="other-role"
+									transition:slide={{ duration: prefersReducedMotion() ? 0 : 320, easing: cubicOut }}
+									onintroend={(e) => e.currentTarget.querySelector('input')?.focus()}
+								>
+									<TextField
+										bind:value={roleOther}
+										label="Your role"
+										placeholder="e.g. Data Scientist"
+											maxlength={50}
+										error={errors.roleOther}
+									/>
+								</div>
+							{/if}
 						</div>
 					{:else if step === 1}
 						<header class="step-head">
@@ -615,6 +637,12 @@
 	.block-label {
 		font-size: 0.9rem;
 		font-weight: 600;
+	}
+
+	/* Padding, not margin, so `slide` animates the gap along with the field */
+	.other-role {
+		max-width: 360px;
+		padding-top: 0.3rem;
 	}
 
 	.overall {
